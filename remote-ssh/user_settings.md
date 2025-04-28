@@ -40,6 +40,16 @@ git config user.name harutaka
 git config user.email 10650294+harutaka@users.noreply.github.com
 ```
 
+## SSH 鍵の作成
+
+暗号化方式について、2025 年時点では ed25519 が推奨されています。
+昔よく使われていた rsa よりも、高速でセキュアです。
+続けて GitHub など、必要な箇所に公開鍵を登録してください。
+
+```bash
+ssh-keygen -t ed25519
+```
+
 ## VSCode の拡張機能のインストール
 
 - Japanese Language Pack for Visual Studio Code
