@@ -1,0 +1,117 @@
+# SSM を使った Remote-SSH 拡張機能セットアップ方法
+
+VSCode の Remote-SSH 拡張機能を使って、EC2 インスタンスに 接続します。通常は EC2 のキーペア(pem ファイル)を使用して接続することが多いですが、管理が大変なのでキーペアを作成せず、SSM Session Manager を使って接続する方法をまとめます。
+
+## EC2 の構築
+
+1. Systems Manager エージェントの導入
+   Amazon Linux 系か Ubuntu Server であれば、デフォルトで Systems Manager エージェント（SSM Agent）がインストールされているので、設定不要です。これ以外の OS の場合は手動でエージェントを導入する必要がありますので要注意。
+   https://docs.aws.amazon.com/ja_jp/systems-manager/latest/userguide/ami-preinstalled-agent.html
+
+2. IAM プロファイルの設定
+   EC2 インスタンスを作成する際に IAM プロファイル(EC2 用の IAM ロール)を設定します。
+   以下のポリシーをアタッチしたロールを事前に作っておけば OK。
+
+- AmazonSSMManagedInstanceCore
+- AmazonEC2RoleforSSM
+- AmazonSSMFullAccess(こちらは、生成した publickey を送る必要があるので必須)
+
+## Windows
+
+### ツールのインストール
+
+AWSCLI と SessionManagerPlugin をインストールします。
+インストール直後はパスが通っていないので、再起動します。
+
+```
+$ winget install -e --id=Amazon.AWSCLI
+$ winget install -e --id=Amazon.SessionManagerPlugin
+```
+
+### aws の初期設定
+
+IAM ユーザに対してアクセスキーを発行しておきます。
+
+次に、コマンドプロンプトで以下のコマンドを実行し、プロファイルを作成します。
+プロファイル名の部分は、お好きな任意のプロファイル名を指定してください。
+
+```
+$ aws configure --profile [プロファイル名]
+AWS Access Key ID [None]: [アクセスキーIDを入力]
+AWS Secret Access Key [None]: [シークレットアクセスキーを入力]
+Default region name [None]: ap-northeast-1
+Default output format [None]:[何も入力せずEnter]
+$ aws sts get-caller-identity --profile [プロファイル名]  # 確認
+```
+
+## Mac/Linux
+
+### ツールのインストール
+
+Homebrew でインストールします。
+
+```
+$ brew install awscli session-manager-plugin
+```
+
+### aws の初期設定
+
+IAM ユーザに対してアクセスキーを発行しておきます。
+Windows の同項目を参照してください。
+
+### SSH 接続スクリプトの作成
+
+Mac の場合、~/.ssh/にて ssm-proxy.sh ファイルを作成し、下記のスクリプトを作成します。
+
+- PUBLIC_KEY_PATH: 自分の公開鍵のパス (例：id_rsa.pub)
+- <username>: Mac のユーザー名
+
+```bash
+#!/bin/bash
+
+PUBLIC_KEY_PATH=file:///Users/<username>/.ssh/id_rsa.pub
+
+USER=$1
+PORT=$2
+INSTANCE_ID=$3
+AWS_PROFILE=$4
+AVAILABILITY_ZONE=$5
+
+aws ec2-instance-connect send-ssh-public-key \
+    --instance-id ${INSTANCE_ID} \
+    --availability-zone ${AVAILABILITY_ZONE} \
+    --instance-os-user ${USER} \
+    --ssh-public-key ${PUBLIC_KEY_PATH} --profile ${AWS_PROFILE} > /dev/null;
+
+aws ssm start-session --profile ${AWS_PROFILE} \
+    --target ${INSTANCE_ID} --profile ${AWS_PROFILE}  \
+    --document-name AWS-StartSSHSession --parameters portNumber=${PORT}
+```
+
+権限を付与します。
+
+```bash
+$ chmod +x ~/.ssh/ssm-proxy.sh
+```
+
+### SSH Config の設定
+
+SSH Config に以下の設定を追加します。
+User の値を適宜変更してください。
+
+Mac の場合、~/.ssh/config に以下の設定を追加します。
+
+- <hostname>: 任意のホスト名
+- <instance id>: 接続先の EC2 インスタンスの ID
+- <aws profile>: AWS のプロファイル名
+- <availability zone> 接続先の EC2 インスタンスの AZ (例：ap-northeast-1a)
+- <username>: EC2 インスタンスのユーザー名(Ubuntu の場合、デフォルトは ubuntu)
+
+```
+Host <hostname>
+    ProxyCommand sh -c "~/.ssh/ssm-proxy.sh %r %p <instance id> <aws profile> <availability zone>"
+    User <username>
+    ForwardAgent yes
+    UserKnownHostsFile /dev/null
+    StrictHostKeyChecking no
+```
