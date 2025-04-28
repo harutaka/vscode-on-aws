@@ -10,9 +10,23 @@ VSCode の Remote-SSH 拡張機能を使って、EC2 インスタンスに 接�
 
 2. IAM プロファイルの設定
    EC2 インスタンスを作成する際に IAM プロファイル(EC2 用の IAM ロール)を設定します。
-   以下のポリシーをアタッチしたロールを事前に作っておけば OK。
+   以下のポリシーをアタッチしたロールを事前に作っておけば OKです。
 
 - AmazonSSMManagedInstanceCore
+
+3. 開始スクリプトの設定
+   EC2 インスタンスの起動時に実行するスクリプトを設定します。
+   `userdata.sh` をアップロードするか、その内容をコンソールのフォームに貼り付けてください。
+
+4. ユーザーの設定
+   EC2 インスタンス起動後に、ユーザーを作成します。
+   マネジメントコンソールより、対象のインスタンスに接続し、セッションマネージャーより以下のコマンドを実行します。
+
+```bash
+$ sudo useradd --shell /bin/bash --create-home <username>
+$ sudo passwd <username>
+$ sudo gpasswd -a <username> sudo
+```
 
 ## Windows
 
@@ -113,3 +127,13 @@ Host <hostname>
     UserKnownHostsFile /dev/null
     StrictHostKeyChecking no
 ```
+
+## 接続確認
+VSCodeの場合、Remote-SSH拡張機能を使用します。
+Shift + Command/Control + Pを押下し、Remote-SSH: Connect to Host...を選択します。
+続いて、先程作成したSSH Configの<hostname>を選択すれば接続できます。
+
+## その後の設定
+以降は、ユーザー毎の設定です。
+ご自由に設定してください。
+筆者推奨の設定は、[ユーザー毎のセットアップ](user_settings.md) を参照してください。
