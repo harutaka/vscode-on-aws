@@ -13,8 +13,6 @@ VSCode の Remote-SSH 拡張機能を使って、EC2 インスタンスに 接�
    以下のポリシーをアタッチしたロールを事前に作っておけば OK。
 
 - AmazonSSMManagedInstanceCore
-- AmazonEC2RoleforSSM
-- AmazonSSMFullAccess(こちらは、生成した publickey を送る必要があるので必須)
 
 ## Windows
 
