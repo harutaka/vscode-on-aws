@@ -58,6 +58,65 @@ Default output format [None]:[何も入力せずEnter]
 $ aws sts get-caller-identity --profile [プロファイル名]  # 確認
 ```
 
+### SSH 接続スクリプトの作成
+
+Windows の場合、~/.ssh/にて ssm-proxy.ps1 ファイルを作成し、下記のスクリプトを作成します。
+
+- PUBLIC_KEY_PATH: 自分の公開鍵のパス (例：id_rsa.pub)
+- <username>: Windows のユーザー名
+
+```ps1
+$PUBLIC_KEY_PATH="file://C:\Users\<username>\.ssh\id_rsa.pub"
+
+$ssh_user = $args[0]
+$ssh_port = $args[1]
+$ec2_instance_id = $args[2]
+$aws_profile=$args[3]
+$avalability_zone=$args[4] # リージョンではなくAZを指定する
+
+aws ec2-instance-connect send-ssh-public-key `
+    --instance-id "$ec2_instance_id" `
+    --availability-zone "$avalability_zone" `
+    --instance-os-user "$ssh_user" `
+    --ssh-public-key "$PUBLIC_KEY_PATH" `
+    --profile "$aws_profile"
+
+aws ssm start-session `
+  --target "$ec2_instance_id" `
+  --document-name 'AWS-StartSSHSession' `
+  --parameters "portNumber=$ssh_port"
+  --profile "$aws_profile"
+```
+
+初期設定では、powershellでのスクリプトの実行が許可されていないため、管理者権限で以下を実行します。
+
+```powershell
+$ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
+```
+
+### SSH Config の設定
+
+SSH Config に以下の設定を追加します。
+User の値を適宜変更してください。
+
+Mac の場合、~/.ssh/config に以下の設定を追加します。
+
+- <hostname>: 任意のホスト名
+- <username>: Windows のユーザー名
+- <instance id>: 接続先の EC2 インスタンスの ID
+- <aws profile>: AWS のプロファイル名
+- <availability zone> 接続先の EC2 インスタンスの AZ (例：ap-northeast-1a)
+- <ec2username>: EC2 インスタンスのユーザー名(Ubuntu の場合、デフォルトは ubuntu)
+
+```
+Host <hostname>
+    ProxyCommand C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -ExecutionPolicy Bypass -File C:\Users\<username>\.ssh\ssm-proxy.ps1 %r %p <instance id> <aws profile> <availability zone>
+    User <ec2username>
+    ForwardAgent yes
+    UserKnownHostsFile /dev/null
+    StrictHostKeyChecking no
+```
+
 ## Mac/Linux
 
 ### ツールのインストール
@@ -119,12 +178,12 @@ Mac の場合、~/.ssh/config に以下の設定を追加します。
 - <instance id>: 接続先の EC2 インスタンスの ID
 - <aws profile>: AWS のプロファイル名
 - <availability zone> 接続先の EC2 インスタンスの AZ (例：ap-northeast-1a)
-- <username>: EC2 インスタンスのユーザー名(Ubuntu の場合、デフォルトは ubuntu)
+- <ec2username>: EC2 インスタンスのユーザー名(Ubuntu の場合、デフォルトは ubuntu)
 
 ```
 Host <hostname>
     ProxyCommand sh -c "~/.ssh/ssm-proxy.sh %r %p <instance id> <aws profile> <availability zone>"
-    User <username>
+    User <ec2username>
     ForwardAgent yes
     UserKnownHostsFile /dev/null
     StrictHostKeyChecking no
