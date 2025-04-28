@@ -26,6 +26,8 @@ VSCode の Remote-SSH 拡張機能を使って、EC2 インスタンスに 接�
 $ sudo useradd --shell /bin/bash --create-home <username>
 $ sudo passwd <username>
 $ sudo gpasswd -a <username> sudo
+
+$ sudo update-alternatives --config editor  # デフォルトエディタを変更(筆者はnanoからvimへ)
 ```
 
 ## Windows
