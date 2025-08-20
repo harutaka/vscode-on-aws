@@ -12,6 +12,15 @@ $ sudo visudo -f /etc/sudoers.d/<username>
 <username> ALL=(ALL) NOPASSWD:ALL
 ```
 
+## ツールのショートカット設定
+
+以下のツールは、使用時の利便性向上のためシンボリックリンクを作成します。
+
+```bash
+ln -s $(which fdfind) ~/.local/bin/fd
+ln -s $(which batcat) ~/.local/bin/bat
+```
+
 ## 必要なツールのインストール
 
 筆者は、mise を使用してツールのインストールおよびバージョン管理を行っています。
