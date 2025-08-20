@@ -2,7 +2,12 @@
 
 ## locale設定
 
-起動時にlocaleの設定を読み込みます。
+起動時にlocaleの設定します。
+
+```bash
+echo "# locale" >> ~/.bashrc
+echo "LANG=ja_JP.UTF-8" >> ~/.bashrc
+```
 
 
 ## sudo 時のパスワード要求スキップ
@@ -34,6 +39,7 @@ npmやpythonパッケージも一緒に管理できます。
 ```bash
 # miseのインストール
 curl https://mise.run | sh
+echo "# locale" >> ~/.bashrc
 echo 'eval "$(~/.local/bin/mise activate bash)"' >> ~/.bashrc
 echo "export MISE_ENV_FILE=.env" >> ~/.bashrc  # ディレクトリ毎に.envを読み込む(direnv機能)
 
