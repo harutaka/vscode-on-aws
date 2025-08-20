@@ -23,7 +23,8 @@ ln -s $(which batcat) ~/.local/bin/bat
 
 ## 必要なツールのインストール
 
-筆者は、mise を使用してツールのインストールおよびバージョン管理を行っています。
+筆者は、mise を使用してツールのインストールおよびバージョン管理を行っています。  
+npmやpythonパッケージも一緒に管理できます。
 
 ```bash
 # miseのインストール
@@ -31,12 +32,16 @@ curl https://mise.run | sh
 echo 'eval "$(~/.local/bin/mise activate bash)"' >> ~/.bashrc
 echo "MISE_ENV_FILE=.env" >> ~/.bashrc  # ディレクトリ毎に.envを読み込む(direnv機能)
 
+mise install uv@latest
+mise use -g uv@latest
 mise install python@latest
 mise use -g python@latest
 mise install node@lts
 mise use -g node@lts
-mise install go@latest
-mise use -g go@latest
+
+# npmパッケージのインストール
+mise use -g npm:tldr
+mise use -g npm:@anthropic-ai/claude-code
 ```
 
 ## Git の設定
