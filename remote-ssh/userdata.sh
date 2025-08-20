@@ -3,7 +3,7 @@ timedatectl set-timezone Asia/Tokyo
 
 apt-get update
 apt-get install -y -q language-pack-ja
-localectl set-locale LANG=ja_JP.UTF-8
+localectl set-locale LANG=ja_JP.UTF-8 LANGUAGE="ja_JP:ja"
 
 # AWS CLI
 apt-get install -y -q curl unzip

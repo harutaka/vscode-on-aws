@@ -1,5 +1,10 @@
 # ユーザー毎のセットアップ
 
+## locale設定
+
+起動時にlocaleの設定を読み込みます。
+
+
 ## sudo 時のパスワード要求スキップ
 
 デフォルトでは、sudo を実行する際にパスワードを要求されます。
@@ -30,7 +35,7 @@ npmやpythonパッケージも一緒に管理できます。
 # miseのインストール
 curl https://mise.run | sh
 echo 'eval "$(~/.local/bin/mise activate bash)"' >> ~/.bashrc
-echo "MISE_ENV_FILE=.env" >> ~/.bashrc  # ディレクトリ毎に.envを読み込む(direnv機能)
+echo "export MISE_ENV_FILE=.env" >> ~/.bashrc  # ディレクトリ毎に.envを読み込む(direnv機能)
 
 mise install uv@latest
 mise use -g uv@latest
