@@ -33,4 +33,4 @@ apt-get install -y -q git
 
 # etc
 apt-get install -y -q build-essential jq
-apt-get install -y -q fd-find ripgrep bat
+apt-get install -y -q fd-find ripgrep bat lsd fzf zoxide

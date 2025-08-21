@@ -24,11 +24,18 @@ $ sudo visudo -f /etc/sudoers.d/<username>
 
 ## ツールのショートカット設定
 
-以下のツールは、使用時の利便性向上のためシンボリックリンクを作成します。
+利便性向上のためシンボリックリンクとエイリアスを作成します。
 
 ```bash
+# Symbolic Links
 ln -s $(which fdfind) ~/.local/bin/fd
 ln -s $(which batcat) ~/.local/bin/bat
+
+# alias
+echo "alias ls='lsd'" >> ~/.bashrc
+
+# zoxide
+echo 'eval "$(zoxide init bash --cmd cd)"' >> ~/.bashrc
 ```
 
 ## 必要なツールのインストール
