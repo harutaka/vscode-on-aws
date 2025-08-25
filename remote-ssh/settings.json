@@ -5,7 +5,5 @@
   "editor.tabSize": 2,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "git.autofetch": true,
-  "cody.chat.preInstruction": "Please think thoughts in English  出力は日本語で出力してください。",
-  "cody.edit.preInstruction": "Please think thoughts in English  出力は日本語で出力してください。",
   "cline.preferredLanguage": "Japanese - 日本語"
 }

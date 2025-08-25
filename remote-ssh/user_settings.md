@@ -90,7 +90,7 @@ ssh-keygen -t ed25519
 - Iceberg
 - indent-rainbow
 - Cline
-- Cody
+- Continue
 - Markdown Preview Enhanced
 - Prettier
 
